@@ -1,28 +1,14 @@
 #!/bin/bash
-pset_directory="PS3"
-failed_local_aligner=()
+pset_directory="PS4"
 
 # README filename constants
 p2_readme="README.problem2.txt"
-p3_readme="README.problem3.txt"
-p4_readme="README.problem4.txt"
-p5_readme="README.problem5.txt"
 
-# Python files by program
-p5_py_file="LocalAlignerPlus"
 # README keywords constants
-p1_keywords=()
 p2_keywords=()
-p3_keywords=()
-p4_keywords=()
-p5_keywords=()
 
 # list of submissions that are missing keywords in README
-p1_wrong_netids=()
 p2_wrong_netids=()
-p3_wrong_netids=()
-p4_wrong_netids=()
-p5_wrong_netids=()
 
 
 go_to_main_directory()
@@ -39,14 +25,7 @@ go_to_sub_directory()
   cd $sub_path
 }
 
-save_local_aligner_result()
-{
-  local solutions="";
-  local student_solution=$(python -c 'import LocalAlignerPlus; LocalAlignerPlus.solve_local_aligner_plus()')
-
-}
-
-## Check $found_word to see if the keyword was found
+## Check $found_word to see if the keyword was found in file
 ##
 read_file()
 {
@@ -61,51 +40,39 @@ read_file()
     $found_word=0
 }
 
-check_p4()
+# call this function to check problem 2
+# $1 will the the netid of the student
+check_p2()
 {
   # Boolean tracking if student is missing information
   # If 0, not missing any information; else, missing information
   local netid=$1
   local missing_information=0
 
-  # Read p5 README
-  for keyword in ${p4_keywords[@]}
-  do
-    read_file $p4_readme $keyword
+  echo $(python -c "import GlobalAligner; GlobalAligner.solve_global_aligner()") >> "p2_result.txt"
+  echo $' ' >> "p2_result.txt"
 
+  for keyword in ${p2_keywords[@]}
+  do
+    # Check README file
+    read_file $p2_readme $keyword
+    if [ $found_word -eq 0 ]
+    then
+      $missing_information=1
+    fi
+
+    # Check result file
+    read_file "p2_result.txt" $keyword
     if [ $found_word -eq 0 ]
     then
       $missing_information=1
     fi
   done
 
+  # if missing_information > 0, this user is missing information
   if [ $missing_information -gt 0]
   then
-    p4_wrong_netids+=(${netid})
-  fi
-}
-
-read_p5_readme()
-{
-  # Boolean tracking if student is missing information
-  # If 0, not missing any information; else, missing information
-  local netid=$1
-  local missing_information=0
-
-  # Read p5 README
-  for keyword in ${p5_keywords[@]}
-  do
-    read_file $p5_readme $keyword
-    local keyword_in_printed_output=$(python -c "import LocalAlignerPlus; LocalAlignerPlus.solve_local_aligner_plus()" | grep -i $keyword)
-    if [ $found_word -eq 0 ]
-    then
-      $missing_information=1
-    fi
-  done
-
-  if [ $missing_information -gt 0]
-  then
-    p5_wrong_netids+=(${netid})
+    p2_wrong_netids+=(${netid})
   fi
 }
 
@@ -118,25 +85,11 @@ do
   # go to sub directory
   go_to_sub_directory ${netid}
 
-  # Check README for keywords
-  read_p4_readme ${netid}
-  read_p5_readme ${netid}
+  # Check README and print statements for keywords
+  check_p2 ${netid}
 
   # jump back to main directory
   go_to_main_directory
 done
 
-
-# file_name=$(printf "PS3/%s" "${latest_submissions[0]}")
-# file_name2="${latest_submissions[0]:1:${#latest_submissions[0]}-2}"
-# echo $file_name2
-# cd $file_name
-# alpha=3
-# cd sub_folder2
-# p=$(printf "import test; print test.get_foo(%i)" "$alpha")
-# RESULT=$(python -c "${p[*]}")
-# cd ..
-#
-# echo $RESULT
-#
-# unset RESULT
+echo ${p2_wrong_netids[@]}
