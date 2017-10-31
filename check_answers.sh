@@ -2,18 +2,22 @@
 pset_directory="PS3"
 failed_local_aligner=()
 
-p1_readme="README.problem1.txt"
+# README filename constants
 p2_readme="README.problem2.txt"
 p3_readme="README.problem3.txt"
 p4_readme="README.problem4.txt"
 p5_readme="README.problem5.txt"
 
+# Python files by program
+p5_py_file="LocalAlignerPlus"
+# README keywords constants
 p1_keywords=()
 p2_keywords=()
 p3_keywords=()
 p4_keywords=()
 p5_keywords=()
 
+# list of submissions that are missing keywords in README
 p1_wrong_netids=()
 p2_wrong_netids=()
 p3_wrong_netids=()
@@ -57,22 +61,42 @@ read_file()
     $found_word=0
 }
 
-latest_submissions=($(python -c "import get_latest_submissions; print get_latest_submissions.get_latest_submissions('PS3')" | tr -d '[],'))
-
-for netid in ${latest_submissions[@]}
-do
-  # go to sub directory
-  go_to_sub_directory ${netid}
-
+check_p4()
+{
   # Boolean tracking if student is missing information
   # If 0, not missing any information; else, missing information
-  missing_information=0
+  local netid=$1
+  local missing_information=0
+
+  # Read p5 README
+  for keyword in ${p4_keywords[@]}
+  do
+    read_file $p4_readme $keyword
+
+    if [ $found_word -eq 0 ]
+    then
+      $missing_information=1
+    fi
+  done
+
+  if [ $missing_information -gt 0]
+  then
+    p4_wrong_netids+=(${netid})
+  fi
+}
+
+read_p5_readme()
+{
+  # Boolean tracking if student is missing information
+  # If 0, not missing any information; else, missing information
+  local netid=$1
+  local missing_information=0
 
   # Read p5 README
   for keyword in ${p5_keywords[@]}
   do
     read_file $p5_readme $keyword
-
+    local keyword_in_printed_output=$(python -c "import LocalAlignerPlus; LocalAlignerPlus.solve_local_aligner_plus()" | grep -i $keyword)
     if [ $found_word -eq 0 ]
     then
       $missing_information=1
@@ -83,6 +107,20 @@ do
   then
     p5_wrong_netids+=(${netid})
   fi
+}
+
+
+# Start main execution
+latest_submissions=($(python -c "import get_latest_submissions; print get_latest_submissions.get_latest_submissions('PS3')" | tr -d '[],'))
+
+for netid in ${latest_submissions[@]}
+do
+  # go to sub directory
+  go_to_sub_directory ${netid}
+
+  # Check README for keywords
+  read_p4_readme ${netid}
+  read_p5_readme ${netid}
 
   # jump back to main directory
   go_to_main_directory
