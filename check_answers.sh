@@ -8,6 +8,19 @@ p3_readme="README.problem3.txt"
 p4_readme="README.problem4.txt"
 p5_readme="README.problem5.txt"
 
+p1_keywords=()
+p2_keywords=()
+p3_keywords=()
+p4_keywords=()
+p5_keywords=()
+
+p1_wrong_netids=()
+p2_wrong_netids=()
+p3_wrong_netids=()
+p4_wrong_netids=()
+p5_wrong_netids=()
+
+
 go_to_main_directory()
 {
   cd ../..
@@ -48,12 +61,30 @@ latest_submissions=($(python -c "import get_latest_submissions; print get_latest
 
 for netid in ${latest_submissions[@]}
 do
+  # go to sub directory
   go_to_sub_directory ${netid}
 
-  # Read README
+  # Boolean tracking if student is missing information
+  # If 0, not missing any information; else, missing information
+  missing_information=0
 
+  # Read p5 README
+  for keyword in ${p5_keywords[@]}
+  do
+    read_file $p5_readme $keyword
 
+    if [ $found_word -eq 0 ]
+    then
+      $missing_information=1
+    fi
+  done
 
+  if [ $missing_information -gt 0]
+  then
+    p5_wrong_netids+=(${netid})
+  fi
+
+  # jump back to main directory
   go_to_main_directory
 done
 
