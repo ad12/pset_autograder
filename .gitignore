@@ -4,3 +4,4 @@ PS*
 # output files
 *.pyc
 *.DS_Store
+*.txt

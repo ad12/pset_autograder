@@ -2,6 +2,12 @@
 pset_directory="PS3"
 failed_local_aligner=()
 
+p1_readme="README.problem1.txt"
+p2_readme="README.problem2.txt"
+p3_readme="README.problem3.txt"
+p4_readme="README.problem4.txt"
+p5_readme="README.problem5.txt"
+
 go_to_main_directory()
 {
   cd ../..
@@ -16,25 +22,26 @@ go_to_sub_directory()
   cd $sub_path
 }
 
-test_local_aligner
+save_local_aligner_result()
 {
   local solutions="";
-  local student_solution=$(python -c 'import LocalAlignerPlus; print LocalAlignerPlus.solve_local_aligner_plus()')
+  local student_solution=$(python -c 'import LocalAlignerPlus; LocalAlignerPlus.solve_local_aligner_plus()')
 
-  solution_matches=0;
-  for solution in ${solutions[@]}
-  do
-    if (solution == student_solution)
-    then
-      $solution_matches=1
-      break;
-    fi
-  done
+}
 
-  if ($solution_matches==0)
+## Check $found_word to see if the keyword was found
+##
+read_file()
+{
+  found_word=1
+  local filename=$1
+  local keyword=$2
+
+  local grep_result=$(grep ${keyword[@]} ${filename[@]})
+
+  if [ ${#grep_result} -eq 0 ]
   then
-
-  fi
+    $found_word=0
 }
 
 latest_submissions=($(python -c "import get_latest_submissions; print get_latest_submissions.get_latest_submissions('PS3')" | tr -d '[],'))
@@ -43,7 +50,8 @@ for netid in ${latest_submissions[@]}
 do
   go_to_sub_directory ${netid}
 
-  # TEST CODE
+  # Read README
+
 
 
   go_to_main_directory
