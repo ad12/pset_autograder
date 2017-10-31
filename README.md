@@ -13,3 +13,11 @@ pset_autograder
         ...
 
 ```
+
+## Additions
+1. Please add the keywords (known answers) in the array in ```check_answers.sh``` in the ```p2_keywords``` array
+
+Example:
+```
+p2_keywords=("aaggttcc" "410")```
+```

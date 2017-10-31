@@ -10,7 +10,6 @@ p2_keywords=()
 # list of submissions that are missing keywords in README
 p2_wrong_netids=()
 
-
 go_to_main_directory()
 {
   cd ../..
